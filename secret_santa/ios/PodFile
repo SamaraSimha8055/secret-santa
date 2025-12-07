@@ -8,21 +8,17 @@ use_modular_headers!
 inhibit_all_warnings!
 
 target 'Runner' do
-  # Pods for Flutter
+  # Add Flutter pods
   pod 'Firebase/Core'
   pod 'Firebase/Auth'
   pod 'Firebase/Firestore'
   pod 'Firebase/Functions'
-
-  # Add Flutter plugins manually
-  flutter_application_path = '../'
-  eval(File.read(File.join(flutter_application_path, '.ios', 'Flutter', 'podhelper.rb')), binding)
 end
 
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
-      # Force all pods to iOS 15
+      # Force iOS 15
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
       # Exclude arm64 for simulator to avoid build errors
       config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
