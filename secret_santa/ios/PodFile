@@ -1,27 +1,42 @@
-platform :ios, '15.0'
+platform :ios, '13.0'
 
+# Required for Flutter + Firebase
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
 
-use_frameworks! :linkage => :static
-use_modular_headers!
+project 'Runner', {
+  'Debug' => :debug,
+  'Profile' => :release,
+  'Release' => :release,
+}
 
-inhibit_all_warnings!
+def flutter_root
+  generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
+  unless File.exist?(generated_xcode_build_settings_path)
+    raise "#{generated_xcode_build_settings_path} does not exist. Run flutter pub get."
+  end
+
+  File.foreach(generated_xcode_build_settings_path) do |line|
+    matches = line.match(/FLUTTER_ROOT\=(.*)/)
+    return matches[1].strip if matches
+  end
+  raise "FLUTTER_ROOT not found"
+end
+
+# Load Flutter
+require File.expand_path(File.join(flutter_root, 'packages', 'flutter_tools', 'bin', 'podhelper'), __FILE__)
+flutter_ios_podfile_setup
 
 target 'Runner' do
-  # Add Flutter pods
-  pod 'Firebase/Core'
-  pod 'Firebase/Auth'
-  pod 'Firebase/Firestore'
-  pod 'Firebase/Functions'
+  use_frameworks!        # REQUIRED for Firebase
+  use_modular_headers!
+
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
 end
 
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
-      # Force iOS 15
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
-      # Exclude arm64 for simulator to avoid build errors
-      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
     end
   end
 end
