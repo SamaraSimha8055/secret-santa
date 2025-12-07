@@ -1,0 +1,35 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "secret-santa-8055",
+          "appId": "1:660296193068:android:fc341922272bd0224ced89",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "secret-santa-8055",
+          "configurations": {
+            "android": "1:660296193068:android:fc341922272bd0224ced89",
+            "ios": "1:660296193068:ios:b9b0926f04ca4afd4ced89"
+          }
+        }
+      }
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ]
+    }
+  ]
+}
