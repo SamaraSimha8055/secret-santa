@@ -13,7 +13,10 @@
           "projectId": "secret-santa-8055",
           "configurations": {
             "android": "1:660296193068:android:fc341922272bd0224ced89",
-            "ios": "1:660296193068:ios:b9b0926f04ca4afd4ced89"
+            "ios": "1:660296193068:ios:b9b0926f04ca4afd4ced89",
+            "macos": "1:660296193068:ios:b9b0926f04ca4afd4ced89",
+            "web": "1:660296193068:web:4bbe08439d76cd324ced89",
+            "windows": "1:660296193068:web:c93e261b8cd347114ced89"
           }
         }
       }
@@ -31,5 +34,20 @@
         "*.local"
       ]
     }
-  ]
+  ],
+  "hosting": {
+    "public": "build/web",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {"source": "**", "destination": "/index.html"}
+    ],
+    "headers": [
+      {
+        "source": "**",
+        "headers": [
+          {"key": "Cache-Control", "value": "no-cache, no-store, must-revalidate"}
+        ]
+      }
+    ]
+  }
 }

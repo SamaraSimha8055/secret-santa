@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -28,15 +25,9 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -65,4 +56,34 @@ class DefaultFirebaseOptions {
     storageBucket: 'secret-santa-8055.firebasestorage.app',
     iosBundleId: 'com.shuffle.secretSanta',
   );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyCmW7jWFZEePl41TRGxDcnKSBhNJTujlE8',
+    appId: '1:660296193068:web:4bbe08439d76cd324ced89',
+    messagingSenderId: '660296193068',
+    projectId: 'secret-santa-8055',
+    authDomain: 'secret-santa-8055.firebaseapp.com',
+    storageBucket: 'secret-santa-8055.firebasestorage.app',
+    measurementId: 'G-XSX12YW6B4',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyCgNq3stIbu5MMuoTyUf7q5kAMM_Z9wAdA',
+    appId: '1:660296193068:ios:b9b0926f04ca4afd4ced89',
+    messagingSenderId: '660296193068',
+    projectId: 'secret-santa-8055',
+    storageBucket: 'secret-santa-8055.firebasestorage.app',
+    iosBundleId: 'com.shuffle.secretSanta',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyCmW7jWFZEePl41TRGxDcnKSBhNJTujlE8',
+    appId: '1:660296193068:web:c93e261b8cd347114ced89',
+    messagingSenderId: '660296193068',
+    projectId: 'secret-santa-8055',
+    authDomain: 'secret-santa-8055.firebaseapp.com',
+    storageBucket: 'secret-santa-8055.firebasestorage.app',
+    measurementId: 'G-TTL8JLK8MP',
+  );
+
 }

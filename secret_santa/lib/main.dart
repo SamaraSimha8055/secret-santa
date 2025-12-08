@@ -43,7 +43,7 @@ class AuthGate extends StatelessWidget {
 }
 
 //
-// 🎄 LOGIN PAGE WITH CHRISTMAS BACKGROUND
+// LOGIN PAGE
 //
 class LoginPage extends StatefulWidget {
   @override
@@ -62,8 +62,24 @@ class _LoginPageState extends State<LoginPage> {
       _error = null;
     });
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      final result = await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: _email.text.trim(), password: _pass.text.trim());
+
+      final user = result.user!;
+      final docRef =
+      FirebaseFirestore.instance.collection('users').doc(user.uid);
+      final doc = await docRef.get();
+
+      if (!doc.exists ||
+          doc.data()?['name'] == null ||
+          doc.data()!['name'].toString().isEmpty) {
+        await docRef.set({
+          'email': user.email,
+          'name': _pass.text.trim(),
+          'wishlist': '',
+          'done': false,
+        }, SetOptions(merge: true));
+      }
     } on FirebaseAuthException catch (e) {
       setState(() {
         _error = e.message;
@@ -139,7 +155,7 @@ class _LoginPageState extends State<LoginPage> {
 }
 
 //
-// 🎁 HOME PAGE + WISHLIST PAGE
+// HOME PAGE
 //
 class HomePage extends StatefulWidget {
   final User user;
@@ -154,6 +170,7 @@ class _HomePageState extends State<HomePage> {
   bool _isAdmin = false;
   bool _allDone = false;
   String? _status;
+  String _name = '';
 
   @override
   void initState() {
@@ -170,6 +187,7 @@ class _HomePageState extends State<HomePage> {
     if (doc.exists) {
       final data = doc.data()!;
       _wishCtrl.text = (data['wishlist'] ?? '');
+      _name = data['name'] ?? widget.user.email!.split('@').first;
       setState(() {
         _saved = data['done'] == true;
       });
@@ -180,6 +198,7 @@ class _HomePageState extends State<HomePage> {
         'wishlist': '',
         'done': false,
       });
+      _name = widget.user.email?.split('@').first ?? widget.user.uid;
     }
   }
 
@@ -197,8 +216,6 @@ class _HomePageState extends State<HomePage> {
     final docRef =
     FirebaseFirestore.instance.collection('users').doc(widget.user.uid);
     await docRef.set({
-      'email': widget.user.email,
-      'name': widget.user.email!.split('@').first,
       'wishlist': _wishCtrl.text.trim(),
       'done': true,
     }, SetOptions(merge: true));
@@ -230,10 +247,11 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final name = widget.user.email?.split('@').first ?? 'User';
+    final displayName =
+    _name.isNotEmpty ? _name : widget.user.email!.split('@').first;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Welcome $name 🎄'),
+        title: Text('Welcome $displayName 🎄'),
         backgroundColor: Colors.red.shade700,
         actions: [
           IconButton(
@@ -263,52 +281,80 @@ class _HomePageState extends State<HomePage> {
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
         SizedBox(height: 8),
         Expanded(
-            child: TextField(
-              controller: _wishCtrl,
-              maxLines: null,
-              expands: true,
-              decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.white70,
-                  border: OutlineInputBorder()),
-            )),
+          child: TextField(
+            controller: _wishCtrl,
+            maxLines: null,
+            expands: true,
+            decoration: InputDecoration(
+                filled: true,
+                fillColor: Colors.white70,
+                border: OutlineInputBorder()),
+          ),
+        ),
         SizedBox(height: 12),
         ElevatedButton(onPressed: _saveWishlist, child: Text('Done')),
       ],
     );
   }
 
+  //
+  // UPDATED SAVED BODY WITH EDIT BUTTON
+  //
   Widget _savedBody() {
     return Center(
       child: Card(
         color: Colors.white.withOpacity(0.85),
         margin: EdgeInsets.all(30),
         child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: _isAdmin
-                ? Column(
-              children: [
-                Text("All users done: ${_allDone ? "Yes" : "No"}",
-                    style: TextStyle(fontSize: 18)),
+          padding: const EdgeInsets.all(20),
+          child: _isAdmin
+              ? Column(
+            children: [
+              Text("All users done: ${_allDone ? "Yes" : "No"}",
+                  style: TextStyle(fontSize: 18)),
+              SizedBox(height: 12),
+              ElevatedButton(
+                  onPressed: _allDone ? _callShuffle : null,
+                  child: Text("Shuffle & Send Emails")),
+              if (_status != null) ...[
                 SizedBox(height: 12),
-                ElevatedButton(
-                    onPressed: _allDone ? _callShuffle : null,
-                    child: Text("Shuffle & Send Emails")),
-                if (_status != null) ...[
-                  SizedBox(height: 12),
-                  Text(_status!)
-                ]
-              ],
-            )
-                : Text("Thanks! 🎄 Your wishlist is submitted.\n"
-                "Wait for the Secret Santa surprise!")),
+                Text(_status!)
+              ]
+            ],
+          )
+              : Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "Thanks! 🎄 Your wishlist is submitted.\n"
+                    "Wait for the Secret Santa surprise!",
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 20),
+
+              // ⭐ EDIT BUTTON ADDED ⭐
+              ElevatedButton.icon(
+                onPressed: () {
+                  setState(() {
+                    _saved = false; // Go back to editing form
+                  });
+                },
+                icon: Icon(Icons.edit),
+                label: Text("Edit Wishlist"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                ),
+              )
+            ],
+          ),
+        ),
       ),
     );
   }
 }
 
 //
-// 🎅 SUPER ADMIN LOGIN + DASHBOARD
+// SUPER ADMIN LOGIN
 //
 class SuperAdminLoginPage extends StatefulWidget {
   @override
@@ -397,6 +443,9 @@ class _SuperAdminLoginPageState extends State<SuperAdminLoginPage> {
   }
 }
 
+//
+// SUPER ADMIN DASHBOARD
+//
 class SuperAdminDashboard extends StatelessWidget {
   final List assignments;
   SuperAdminDashboard({required this.assignments});
