@@ -87,7 +87,6 @@ exports.shuffleAndSend = functions.https.onCall(async (data, context) => {
       giverEmail: giver.email,
       receiverUid,
       receiverName: receiver.name,
-      receiverEmail: receiver.email,
       receiverWishlist: receiver.wishlist || '',
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     });
@@ -98,9 +97,9 @@ exports.shuffleAndSend = functions.https.onCall(async (data, context) => {
         to: giver.email,
         from: SENDGRID_FROM,
         subject: `Your Secret Santa assignment`,
-        text: `Hello ${giver.name},\n\nYou are Secret Santa for: ${receiver.name} (${receiver.email}).\n\nTheir wishlist:\n${receiver.wishlist || "(no wishlist)"}\n\nHappy gifting!`,
+        text: `Hello ${giver.name},\n\nYou are Secret Santa for: ${receiver.name}.\n\nTheir wishlist:\n${receiver.wishlist || "(no wishlist)"}\n\nHappy gifting!`,
         html: `<p>Hello ${giver.name},</p>
-               <p><strong>You are Secret Santa for: ${receiver.name} (${receiver.email})</strong></p>
+               <p><strong>You are Secret Santa for: ${receiver.name}</strong></p>
                <p><strong>Their wishlist:</strong><br>${(receiver.wishlist || '(no wishlist)').replace(/\n/g,'<br>')}</p>
                <p>Happy gifting!</p>`
       };

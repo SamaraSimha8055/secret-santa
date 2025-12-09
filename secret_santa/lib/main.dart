@@ -298,7 +298,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   //
-  // UPDATED SAVED BODY WITH EDIT BUTTON
+  // UPDATED SAVED BODY WITH EDIT BUTTON FOR OPTION A
   //
   Widget _savedBody() {
     return Center(
@@ -307,36 +307,22 @@ class _HomePageState extends State<HomePage> {
         margin: EdgeInsets.all(30),
         child: Padding(
           padding: const EdgeInsets.all(20),
-          child: _isAdmin
-              ? Column(
-            children: [
-              Text("All users done: ${_allDone ? "Yes" : "No"}",
-                  style: TextStyle(fontSize: 18)),
-              SizedBox(height: 12),
-              ElevatedButton(
-                  onPressed: _allDone ? _callShuffle : null,
-                  child: Text("Shuffle & Send Emails")),
-              if (_status != null) ...[
-                SizedBox(height: 12),
-                Text(_status!)
-              ]
-            ],
-          )
-              : Column(
+          child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // Common message for all users incl. admin
               Text(
                 "Thanks! 🎄 Your wishlist is submitted.\n"
-                    "Wait for the Secret Santa surprise!",
+                    "You can still update it anytime.",
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 20),
 
-              // ⭐ EDIT BUTTON ADDED ⭐
+              // ⭐ Admin & Users both get Edit Button ⭐
               ElevatedButton.icon(
                 onPressed: () {
                   setState(() {
-                    _saved = false; // Go back to editing form
+                    _saved = false; // Go to edit form
                   });
                 },
                 icon: Icon(Icons.edit),
@@ -344,7 +330,37 @@ class _HomePageState extends State<HomePage> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orange,
                 ),
-              )
+              ),
+
+              if (_isAdmin) ...[
+                SizedBox(height: 30),
+                Divider(),
+                SizedBox(height: 10),
+
+                // ⭐ Admin special controls remain available ⭐
+                Text(
+                  "Admin Panel",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red,
+                  ),
+                ),
+
+                SizedBox(height: 12),
+                Text("All users done: ${_allDone ? "Yes" : "No"}",
+                    style: TextStyle(fontSize: 18)),
+                SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: _allDone ? _callShuffle : null,
+                  child: Text("Shuffle & Send Emails"),
+                ),
+
+                if (_status != null) ...[
+                  SizedBox(height: 12),
+                  Text(_status!),
+                ],
+              ],
             ],
           ),
         ),
